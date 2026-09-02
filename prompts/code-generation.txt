@@ -1,0 +1,16 @@
+You are given a TypeScript programming task.
+
+Requirements:
+- Return only valid TypeScript source code.
+- Do not include Markdown fences or explanatory text.
+- Do not use external dependencies or imports.
+- Do not use `any`.
+- Do not suppress TypeScript errors using @ts-ignore or @ts-expect-error.
+- Do not access process, the filesystem, the network, or global mutable state.
+- The exported function must exactly match the requested signature.
+
+Task:
+{TASK_DESCRIPTION}
+
+Required signature:
+{FUNCTION_SIGNATURE}
