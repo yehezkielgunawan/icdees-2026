@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .work/
+icdees_llm_typescript_research_plan.md
 campaigns/
 generated/
 .env
