@@ -1,0 +1,7 @@
+{
+  "id": "task-04",
+  "category": "validation",
+  "title": "Validate a registration form",
+  "description": "Validate username, email, password, and confirmPassword. Username must contain only ASCII letters, digits, and underscores and be 3 to 20 characters. Email must contain one non-whitespace local part, an @, and a dotted non-whitespace domain. Password must be at least 8 characters and contain at least one letter and one digit. confirmPassword must equal password. Return valid true with an empty errors object only when every rule passes; otherwise return valid false and one message per failed field.",
+  "signature": "export function validateRegistrationForm(input: { username?: unknown; email?: unknown; password?: unknown; confirmPassword?: unknown }): { valid: boolean; errors: Record<string, string> }"
+}

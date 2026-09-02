@@ -1,0 +1,7 @@
+{
+  "id": "task-09",
+  "category": "string-url-processing",
+  "title": "Normalize URL paths",
+  "description": "Normalize a URL path by ensuring exactly one leading slash, collapsing repeated slashes, resolving . segments, resolving .. segments without traversing above the root, and preserving a trailing slash only when the normalized path is not root. Ignore query strings and fragments by treating the input as a path only.",
+  "signature": "export function normalizeUrlPath(path: string): string"
+}

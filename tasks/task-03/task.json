@@ -1,0 +1,7 @@
+{
+  "id": "task-03",
+  "category": "data-transformation",
+  "title": "Build a category tree",
+  "description": "Convert flat category records into a nested tree. A record with parentId null is a root. Attach children in input order. If a parentId does not exist, treat that record as a root. Every returned node must contain a fresh children array and the input records must not be mutated.",
+  "signature": "export function buildCategoryTree(items: readonly { id: string; parentId: string | null; name: string }[]): Array<{ id: string; parentId: string | null; name: string; children: Array<{ id: string; parentId: string | null; name: string; children: unknown[] }> }>"
+}

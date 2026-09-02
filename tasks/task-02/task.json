@@ -1,0 +1,7 @@
+{
+  "id": "task-02",
+  "category": "data-transformation",
+  "title": "Remove duplicate records by ID",
+  "description": "Return the first occurrence of each record ID, preserving the original order. IDs are strings or numbers and equality follows Map key equality. Do not mutate the input array.",
+  "signature": "export function dedupeById<T extends { id: string | number }>(items: readonly T[]): T[]"
+}

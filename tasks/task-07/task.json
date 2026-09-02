@@ -1,0 +1,7 @@
+{
+  "id": "task-07",
+  "category": "string-url-processing",
+  "title": "Convert a title to a URL-safe slug",
+  "description": "Trim the title, normalize Unicode compatibility characters, remove combining marks, lowercase it, replace each run of non-ASCII-letter-or-digit characters with one hyphen, and remove leading or trailing hyphens. Return an empty string for an empty or punctuation-only title.",
+  "signature": "export function toSlug(title: string): string"
+}

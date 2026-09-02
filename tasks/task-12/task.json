@@ -1,0 +1,7 @@
+{
+  "id": "task-12",
+  "category": "async-promise-utilities",
+  "title": "Add timeout behavior to a promise",
+  "description": "Resolve with the original promise value when it settles before timeoutMs. Reject with an Error using message when the timeout wins. Use 'Operation timed out' when message is omitted. Propagate an original rejection if it occurs before the timeout. Reject immediately for a non-positive or non-finite timeoutMs.",
+  "signature": "export function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message?: string): Promise<T>"
+}

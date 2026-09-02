@@ -1,0 +1,7 @@
+{
+  "id": "task-08",
+  "category": "string-url-processing",
+  "title": "Parse query parameters into a typed object",
+  "description": "Parse a URL query string, optionally beginning with ?. Decode keys and values using URLSearchParams semantics. A key occurring once maps to a string; a repeated key maps to an array of strings in occurrence order. Preserve empty values and return an object with no prototype so a key named __proto__ is ordinary data.",
+  "signature": "export function parseQuery(query: string): Record<string, string | string[]>"
+}

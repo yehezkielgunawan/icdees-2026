@@ -1,0 +1,7 @@
+{
+  "id": "task-14",
+  "category": "web-backend-utilities",
+  "title": "Implement a fixed-window rate limiter",
+  "description": "Implement per-key fixed windows. The first allow(key) starts a window of windowMs milliseconds and consumes one request. Further requests for the same key are allowed while count is below limit and rejected once count reaches limit. At the exact window boundary, the next request starts a fresh window. remaining(key) returns the number of requests still allowed in the current window, or limit when no window exists. limit and windowMs must be positive integers.",
+  "signature": "export class FixedWindowRateLimiter { constructor(limit: number, windowMs: number, now?: () => number); allow(key: string): boolean; remaining(key: string): number }"
+}

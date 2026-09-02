@@ -1,0 +1,7 @@
+{
+  "id": "task-11",
+  "category": "async-promise-utilities",
+  "title": "Run async operations with a concurrency limit",
+  "description": "Apply worker to every item with at most limit workers active at once. Return results in the same order as items, regardless of completion order. An empty input returns an empty array. Reject for a non-positive or non-integer limit and do not invoke worker in that case. If a worker rejects, reject the returned promise.",
+  "signature": "export function mapWithConcurrency<T, R>(items: readonly T[], limit: number, worker: (item: T, index: number) => Promise<R>): Promise<R[]>"
+}

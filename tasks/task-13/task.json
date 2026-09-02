@@ -1,0 +1,7 @@
+{
+  "id": "task-13",
+  "category": "web-backend-utilities",
+  "title": "Implement an in-memory TTL cache",
+  "description": "Implement a generic cache with set, get, has, delete, and clear. Each set stores a value until now() reaches set-time plus ttlMs; an expired entry behaves as absent. ttlMs must be a finite positive number. Injecting now is optional and exists to make expiration deterministic. get and has must remove expired entries.",
+  "signature": "export class TtlCache<K, V> { constructor(now?: () => number); set(key: K, value: V, ttlMs: number): void; get(key: K): V | undefined; has(key: K): boolean; delete(key: K): boolean; clear(): void }"
+}

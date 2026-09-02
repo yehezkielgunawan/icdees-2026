@@ -1,0 +1,7 @@
+{
+  "id": "task-06",
+  "category": "validation",
+  "title": "Validate required configuration values",
+  "description": "Given a configuration object and required key list, report missing and invalid values. A key is missing when it is absent or its value is null or undefined. A string value is invalid when it is blank after trimming. Non-string values are valid, including false and 0. Return missing and invalid keys in the same order as requiredKeys, valid true only when both arrays are empty, and do not mutate the input.",
+  "signature": "export function validateConfig(input: Record<string, unknown>, requiredKeys: readonly string[]): { valid: boolean; missing: string[]; invalid: string[] }"
+}

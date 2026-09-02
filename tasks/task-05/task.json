@@ -1,0 +1,7 @@
+{
+  "id": "task-05",
+  "category": "validation",
+  "title": "Validate pagination query parameters",
+  "description": "Validate page and pageSize values. Missing values default to page 1 and pageSize 20. Accept positive integer numbers or decimal strings containing only digits. pageSize must be at most 100. Return { valid, page, pageSize, errors }, using null for an invalid normalized value and an error key for each invalid field. A valid result has an empty errors object.",
+  "signature": "export function validatePaginationQuery(input: { page?: unknown; pageSize?: unknown }): { valid: boolean; page: number | null; pageSize: number | null; errors: Record<string, string> }"
+}

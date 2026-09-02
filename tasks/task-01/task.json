@@ -1,0 +1,7 @@
+{
+  "id": "task-01",
+  "category": "data-transformation",
+  "title": "Group records by a derived key",
+  "description": "Return an object whose keys are produced by keyOf and whose values contain the original records in their original relative order. Return an empty object for empty input. Do not mutate the input array.",
+  "signature": "export function groupBy<T, K extends PropertyKey>(items: readonly T[], keyOf: (item: T) => K): Record<K, T[]>"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "task-15",
+  "category": "web-backend-utilities",
+  "title": "Implement cursor-based array pagination",
+  "description": "Paginate items using the ID of the last item as the cursor. A null cursor starts at the first item. Return at most limit items and nextCursor equal to the last returned ID when more items remain, otherwise null. A non-null cursor must identify an item or the function must throw. limit must be a positive integer. Do not mutate the input array.",
+  "signature": "export function paginateByCursor<T>(items: readonly T[], cursor: string | null, limit: number, getId: (item: T) => string): { items: T[]; nextCursor: string | null }"
+}
