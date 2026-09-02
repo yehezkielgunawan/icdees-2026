@@ -43,6 +43,7 @@ describe("validatePaginationQuery", () => {
     const result = validatePaginationQuery({ page: 1, pageSize: 101 });
 
     expect(result.valid).toBe(false);
+    expect(result.pageSize).toBeNull();
     expect(result.errors).toHaveProperty("pageSize");
   });
 });

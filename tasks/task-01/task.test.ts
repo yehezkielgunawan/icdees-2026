@@ -26,6 +26,16 @@ describe("groupBy", () => {
     });
   });
 
+  it("supports prototype-sensitive string keys", () => {
+    const result = groupBy(["first", "second"], (value) =>
+      value === "first" ? "__proto__" : "constructor",
+    );
+
+    expect(Object.keys(result)).toEqual(["__proto__", "constructor"]);
+    expect(result["__proto__"]).toEqual(["first"]);
+    expect(result.constructor).toEqual(["second"]);
+  });
+
   it("does not mutate the input array", () => {
     const input = [{ value: "x" }, { value: "y" }];
     const original = [...input];

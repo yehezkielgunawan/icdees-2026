@@ -42,6 +42,19 @@ describe("mapWithConcurrency", () => {
     expect(calls).toBe(0);
   });
 
+  it("invokes worker for undefined items", async () => {
+    const input: Array<number | undefined> = [undefined, 2];
+    const calls: Array<[number | undefined, number]> = [];
+
+    await expect(
+      mapWithConcurrency(input, 1, async (item, index) => {
+        calls.push([item, index]);
+        return item === undefined ? "undefined" : String(item);
+      }),
+    ).resolves.toEqual(["undefined", "2"]);
+    expect(calls).toEqual([[undefined, 0], [2, 1]]);
+  });
+
   it("rejects an invalid limit before starting work", async () => {
     let calls = 0;
     await expect(mapWithConcurrency([1], 0, async () => {

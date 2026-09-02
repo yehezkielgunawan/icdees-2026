@@ -30,5 +30,13 @@ export function validatePaginationQuery(input: {
     errors.pageSize = "Page size must be a positive integer no greater than 100";
   }
 
-  return { valid: Object.keys(errors).length === 0, page, pageSize, errors };
+  const normalizedPageSize =
+    pageSize !== null && pageSize > 100 ? null : pageSize;
+
+  return {
+    valid: Object.keys(errors).length === 0,
+    page,
+    pageSize: normalizedPageSize,
+    errors,
+  };
 }

@@ -14,6 +14,10 @@ describe("toSlug", () => {
     expect(toSlug("Café déjà vu")).toBe("cafe-deja-vu");
   });
 
+  it("removes combining marks outside the basic diacritic block", () => {
+    expect(toSlug("a\u1ab0b")).toBe("ab");
+  });
+
   it("returns an empty string for blank or punctuation-only titles", () => {
     expect(toSlug("   ")).toBe("");
     expect(toSlug("---___")).toBe("");
