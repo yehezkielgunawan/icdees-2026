@@ -105,6 +105,25 @@ Each campaign is frozen in `campaigns/<campaign-id>/`:
 - `evaluations/`: detailed evaluation records;
 - `report/`: CSV, JSONL, model summaries, and completeness status.
 
+The report command also creates a publication bundle for the selected campaign:
+
+```bash
+pnpm run report --campaign final-001
+```
+
+The generated files are written to
+`campaigns/<campaign-id>/report/publication/`:
+
+- `tables/table-1-task-set.md` and `.tex`;
+- `tables/table-2-main-results.md` and `.tex`;
+- `tables/table-3-failure-characteristics.md` and `.tex`;
+- `figures/figure-1-quality-gates.svg` and `.png`.
+
+The tables preserve explicit numerators and denominators. The figure is rendered
+as SVG and rasterized to a 2400-pixel-wide PNG using the pinned, open-licensed
+DejaVu Sans font package. Reports remain campaign-scoped; run the command separately
+for primary and exploratory campaigns.
+
 Campaign input hashes include the study config, all task inputs, prompt, and the
 selected lockfile. Do not manually edit generated artifacts or task tests after
 campaign creation. Create a new campaign when inputs change.

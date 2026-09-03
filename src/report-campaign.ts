@@ -12,6 +12,8 @@ import {
   summarizeByModel,
   writeReportFiles,
 } from "./report.js";
+import { writePublicationFiles } from "./publication.js";
+import { buildPublicationReport } from "./publication-report.js";
 import { writeJsonAtomically } from "./storage.js";
 
 export interface ReportCampaignOptions {
@@ -23,6 +25,7 @@ export interface ReportCampaignOptions {
 export interface ReportCampaignSummary {
   campaignId: string;
   reportDirectory: string;
+  publicationDirectory: string;
   rows: number;
   complete: boolean;
   missing: string[];
@@ -40,7 +43,9 @@ async function exists(path: string): Promise<boolean> {
 export async function runReportCampaign(
   options: ReportCampaignOptions,
 ): Promise<ReportCampaignSummary> {
-  const manifest = await readCampaignManifest(options.projectRoot, options.campaignId);
+  const manifest = await readCampaignManifest(options.projectRoot, options.campaignId, {
+    allowLockfileChanges: true,
+  });
   const tasks = await loadTasks(join(options.projectRoot, "tasks"));
   const campaignDirectory = join(options.projectRoot, "campaigns", options.campaignId);
   const records: EvaluationRecord[] = [];
@@ -72,10 +77,18 @@ export async function runReportCampaign(
     complete: missing.length === 0,
     generatedAt: new Date().toISOString(),
   });
+  const publicationReport = buildPublicationReport({
+    manifest,
+    tasks,
+    rows,
+    complete: missing.length === 0,
+  });
+  const publicationDirectory = await writePublicationFiles(reportDirectory, publicationReport);
 
   return {
     campaignId: options.campaignId,
     reportDirectory,
+    publicationDirectory,
     rows: rows.length,
     complete: missing.length === 0,
     missing,

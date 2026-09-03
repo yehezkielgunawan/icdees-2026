@@ -12,10 +12,10 @@ export interface LintMessage {
 
 export interface LintResult {
   status: StageStatus;
-  errorCount: number;
-  warningCount: number;
-  explicitAnyCount: number;
-  suppressionCount: number;
+  errorCount: number | null;
+  warningCount: number | null;
+  explicitAnyCount: number | null;
+  suppressionCount: number | null;
   messages: LintMessage[];
   durationMs: number;
   error?: string;
@@ -59,10 +59,10 @@ export async function lintCandidate(
   } catch (error) {
     return {
       status: "error",
-      errorCount: 0,
-      warningCount: 0,
-      explicitAnyCount: 0,
-      suppressionCount: 0,
+      errorCount: null,
+      warningCount: null,
+      explicitAnyCount: null,
+      suppressionCount: null,
       messages: [],
       durationMs: Date.now() - startedAt,
       error: error instanceof Error ? error.message : String(error),

@@ -76,6 +76,34 @@ describe("campaign manifests", () => {
     }
   });
 
+  it("can read a frozen campaign for reporting after report-only dependencies change", async () => {
+    const campaignId = "test-report-lockfile-change";
+    const campaignDirectory = join(process.cwd(), "campaigns", campaignId);
+    await rm(campaignDirectory, { recursive: true, force: true });
+
+    try {
+      await createCampaignOnDisk({
+        projectRoot: process.cwd(),
+        purpose: "pilot",
+        campaignId,
+        taskIds: ["task-01"],
+      });
+      const manifestPath = join(campaignDirectory, "manifest.json");
+      const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as {
+        hashes: { lockfile: string };
+      };
+      manifest.hashes.lockfile = "hash-from-before-report-dependencies";
+      await writeFile(manifestPath, `${JSON.stringify(manifest)}\n`, "utf8");
+
+      await expect(readCampaignManifest(process.cwd(), campaignId)).rejects.toThrow(/lockfile/);
+      await expect(readCampaignManifest(process.cwd(), campaignId, {
+        allowLockfileChanges: true,
+      })).resolves.toMatchObject({ campaignId });
+    } finally {
+      await rm(campaignDirectory, { recursive: true, force: true });
+    }
+  });
+
   it("keeps legacy manifests compatible with package-lock.json", async () => {
     const root = await mkdtemp(join(tmpdir(), "icdees-legacy-manifest-"));
     const campaignId = "legacy-package-lock";

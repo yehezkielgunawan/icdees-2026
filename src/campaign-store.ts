@@ -75,6 +75,7 @@ export async function computeCampaignInputHashes(
 async function assertStoredCampaignHashes(
   projectRoot: string,
   record: Pick<StoredCampaignManifest, "hashes" | "lockfileName">,
+  allowLockfileChanges = false,
 ): Promise<void> {
   try {
     assertCampaignHashes(
@@ -83,6 +84,13 @@ async function assertStoredCampaignHashes(
     );
     return;
   } catch (error) {
+    if (
+      allowLockfileChanges
+      && error instanceof Error
+      && error.message === "Campaign input hash changed: lockfile"
+    ) {
+      return;
+    }
     if (
       record.lockfileName !== undefined
       || !(error instanceof Error)
@@ -106,6 +114,10 @@ async function assertStoredCampaignHashes(
       throw legacyError;
     }
   }
+}
+
+export interface ReadCampaignManifestOptions {
+  allowLockfileChanges?: boolean;
 }
 
 async function pathExists(path: string): Promise<boolean> {
@@ -176,6 +188,7 @@ export async function createCampaignOnDisk(
 export async function readCampaignManifest(
   projectRoot: string,
   campaignId: string,
+  options: ReadCampaignManifestOptions = {},
 ): Promise<StoredCampaignManifest> {
   assertCampaignId(campaignId);
   const path = join(projectRoot, "campaigns", campaignId, "manifest.json");
@@ -193,6 +206,6 @@ export async function readCampaignManifest(
   await assertStoredCampaignHashes(projectRoot, {
     hashes: record.hashes as CampaignHashes,
     ...(record.lockfileName === undefined ? {} : { lockfileName: record.lockfileName }),
-  });
+  }, options.allowLockfileChanges === true);
   return value as StoredCampaignManifest;
 }
