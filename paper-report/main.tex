@@ -1,0 +1,133 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+
+\title{Beyond Compilation: An Empirical Evaluation of Functional Correctness and Static Quality in LLM-Generated TypeScript Code}
+
+\author{\IEEEauthorblockN{Yehezkiel Gunawan}
+\IEEEauthorblockA{Bina Nusantara University\\
+Jakarta, Indonesia\\
+yehezkiel.gunawan@binus.ac.id}}
+
+\maketitle
+
+\begin{abstract}
+Compilation is often used as an initial check on code produced by large language models, but it does not establish functional correctness or adherence to static-quality rules. This study evaluates those properties separately for TypeScript. We constructed 15 deterministic utility tasks in five software-engineering categories and generated one solution per task with each of three models, producing 45 programs. Every program passed through source extraction and safety inspection, strict TypeScript compilation, task-specific Vitest tests, and ESLint analysis. Of the 45 programs, 37 compiled, 36 passed all visible tests, and 34 passed the complete quality gate. Eight compilation failures arose from possibly undefined indexed access under strict TypeScript settings. Among the 37 compilable programs, one failed a functional test. Two programs passed all tests but violated selected ESLint rules. The results show modest but measurable attrition after compilation and demonstrate that the three checks answer different questions. For the evaluated tasks and models, generated TypeScript should therefore be treated as candidate code that remains subject to the compiler, tests, and static analysis before integration.
+\end{abstract}
+
+\begin{IEEEkeywords}
+large language models, code generation, TypeScript, functional correctness, static analysis, empirical software engineering
+\end{IEEEkeywords}
+
+\section{Introduction}
+Large language models (LLMs) now produce source code from natural-language requirements, but plausible source text is not equivalent to validated software. Early code-generation benchmarks made execution-based testing central to evaluation. HumanEval, for example, measures whether generated functions pass task tests and introduced pass@k for repeated samples \cite{chen2021humaneval}. Subsequent empirical work has examined generated code across languages, tools, and quality dimensions \cite{xu2022systematic,nguyen2022copilot,yetistiren2022quality}. These studies provide a stronger basis than judging code by syntax or readability alone.
+
+TypeScript makes the distinction between plausibility and validity particularly visible. Its compiler can reject code that would execute in JavaScript because strict options retain uncertainty about indexed values, optional properties, or generic types. A successful compilation still establishes neither compliance with behavioral requirements nor conformance to project-level quality rules. The relevant outcomes form sequential, non-equivalent checks: type-level validity, test-suite correctness, and selected static quality.
+
+Prominent function-level evaluations remain strongly associated with algorithmic tasks, while newer benchmarks extend toward class-level generation and repository issue resolution \cite{du2024classeval,jimenez2024swebench}. Compact TypeScript utilities occupy a useful middle ground. They are deterministic and independently testable, yet reflect validation, URL handling, asynchronous control, caching, rate limiting, and pagination found in web development.
+
+This study asks how reliably contemporary LLMs produce TypeScript that survives three conventional development checks. We address the following questions:
+
+\textit{RQ1: To what extent does generated TypeScript compile under strict compiler settings?}
+
+\textit{RQ2: To what extent are compilable programs functionally correct under task-specific tests?}
+
+\textit{RQ3: What selected static-quality issues remain, including in programs that pass all tests?}
+
+The contribution is a reproducible 15-task TypeScript corpus, a controlled 45-generation comparison under one prompt, and an empirical account of attrition across compilation, testing, and ESLint. The artifact, including tasks, prompts, raw generations, evaluation records, and report scripts, is available online.\footnote{\url{https://github.com/yehezkielgunawan/icdees-2026}}
+
+\section{Related Work}
+\subsection{Functional evaluation of generated code}
+HumanEval established execution against unit tests as a standard measure for function synthesis \cite{chen2021humaneval}. Xu et al. found substantial variation across code models and programming languages \cite{xu2022systematic}. Nguyen and Nadi evaluated Copilot suggestions in multiple languages using tests and complexity measures \cite{nguyen2022copilot}, while Dakhel et al. compared generated and human solutions and documented correctness and reproducibility limitations \cite{dakhel2023asset}. Test quality also affects reported performance. EvalPlus expanded HumanEval tests and exposed incorrect programs accepted by the original suites \cite{liu2023evalplus}. Our use of visible deterministic tests therefore measures conformance to those suites, not proof of correctness.
+
+Recent benchmarks broaden what constitutes a programming task. ClassEval targets class-level generation \cite{du2024classeval}; SWE-bench evaluates changes for issues in existing repositories \cite{jimenez2024swebench}. Our tasks are smaller by design. They isolate strict TypeScript behavior in common utilities and support a controlled comparison, at the cost of lower application-level realism.
+
+\subsection{Quality, robustness, and use}
+Generated-code studies have measured properties beyond tests. Yeti\c{s}tiren et al. assessed multiple quality dimensions \cite{yetistiren2022quality}, and Al Madi examined readability and complexity \cite{almadi2022readable}. Security studies demonstrate that functional appearance does not cover other software properties, although our ESLint rules do not constitute security analysis \cite{pearce2022security}. Barke et al. found that programmers alternate between acceleration and exploration when using generated suggestions, both of which require inspection and revision \cite{barke2023grounded}.
+
+Generation conditions also constrain reproducibility. Semantically similar prompts can change Copilot outputs \cite{mastropaolo2023robustness}; prompt language and repeated runs can change suggestion outcomes \cite{koyanagi2024languages}. Ouyang et al. report nondeterminism in ChatGPT code generation \cite{ouyang2025nondeterminism}. These findings motivate our fixed prompt and precise artifact capture, while also limiting what can be inferred from one generation per model-task pair. A recent systematic review confirms the breadth of LLM uses and evaluation practices in software engineering \cite{hou2024slr}. Against that broader literature, this study contributes ecosystem-specific evidence rather than a new general-purpose benchmark.
+
+\section{Method}
+\subsection{Research design and tasks}
+The independent variable was the model. Dependent variables were strict compilation, full test-suite success, selected ESLint findings, and passage through all gates. The task, prompt, execution order, test suite, compiler, lint rules, and dependency lock were held constant across models.
+
+The corpus contains 15 tasks divided evenly among five categories (Table~\ref{tab:tasks}). Selection required deterministic behavior, no external dependency, bounded source size, and relevance to TypeScript or web-backend development. Examples include building a category tree, validating pagination parameters, normalizing URL paths, limiting asynchronous concurrency, and implementing cursor pagination. Each task has a required exported signature, a reference implementation, and four to six Vitest cases. The corpus contains 75 tests in total. Reference implementations passed all tests, strict compilation, and ESLint under the same evaluator.
+
+\input{tables/task-set}
+
+\subsection{Generation procedure}
+We evaluated three identifiers from the OpenAI provider: \texttt{gpt-5.6-sol}, \texttt{gpt-5.6-terra}, and \texttt{gpt-5.6-luna}, labeled Sol, Terra, and Luna. These identifiers were active in the recorded provider snapshot but do not identify immutable public model revisions. Each model generated one program for each task, for 45 generations. The campaign ran on September 3, 2026 through OpenCode 1.18.26.
+
+One prompt template required source code only, the exact signature, no imports or external dependencies, no \texttt{any}, no TypeScript suppression comments, and no process, file-system, network, or global mutable-state access. The benchmark agent could not call tools and was limited to one step. A temperature of zero was requested, but the runtime marked temperature unsupported for all three models and recorded no applied value. The configured 4096-token output limit was recorded but not transmitted by the generation call, so it is not treated as an enforced control. All raw responses, extracted sources, hashes, and metadata were retained. All 45 generations and extractions succeeded without normalization changes.
+
+\subsection{Evaluation pipeline}
+The evaluator first checked for empty output and disallowed operations. It then compiled each candidate and its tests with TypeScript 5.8.2 using \texttt{strict}, \texttt{noImplicitAny}, \texttt{noUncheckedIndexedAccess}, and \texttt{exactOptionalPropertyTypes}, among other module-isolation settings. Compile failure stopped later stages. Compilable candidates proceeded to their Vitest 3.2.4 suite and ESLint 9.35.0 in parallel.
+
+A candidate was \emph{fully correct} when at least one test ran and every test passed. A candidate was \emph{static-clean} when ESLint completed with zero errors. Selected rules included a cyclomatic-complexity maximum of 12, \texttt{prefer-const}, equality and control-flow rules, and TypeScript rules for explicit \texttt{any} and unused variables. The \emph{full gate} required successful extraction, compilation, full correctness, and zero ESLint errors. Compilation, functional, and full-gate rates use all generations as their denominator. Static-clean and compiled-but-incorrect rates use compilable programs; correct-but-static-issue rates use fully correct programs. Given 15 paired tasks and one sample per cell, we report counts and percentages without hypothesis tests or model-ranking claims.
+
+\section{Results}
+Table~\ref{tab:results} reports each model and the aggregate outcomes. Fig.~\ref{fig:gates} shows the same sequential gates to make attrition explicit.
+
+\input{tables/main-results}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/figure-1-quality-gates.png}
+\caption{Quality-gate survival for the 45 primary generations. Static-clean rates are shown separately because their denominator is the number of compilable candidates.}
+\label{fig:gates}
+\end{figure*}
+
+\subsection{RQ1: Strict compilation}
+Thirty-seven of 45 candidates compiled, an aggregate rate of 82.2\%. The observed model rates ranged from 12/15 (80.0\%) for Sol and Terra to 13/15 (86.7\%) for Luna. Every rejected candidate had exactly one compiler error, and all eight errors involved possibly undefined indexed access under \texttt{noUncheckedIndexedAccess}.
+
+The failures were concentrated in three tasks rather than spread across the corpus. Sol and Terra failed task 08 by constructing an array whose inferred element type remained \texttt{string | undefined}. All three models failed task 11 when passing \texttt{items[index]}, typed as \texttt{T | undefined}, to a worker expecting \texttt{T}. All three failed task 15 through a similar access to the last page item. These are strict type failures, not observed test failures: the pipeline did not run Vitest or ESLint after compilation failed.
+
+\subsection{RQ2: Functional correctness}
+Among 37 compilable candidates, 36 passed their complete task suite (97.3\%). Relative to all generated candidates, the functional success rate was 36/45 (80.0\%). Across compiled programs, 178 of 179 executed test cases passed, but candidate-level outcomes remain the unit of analysis.
+
+The sole compiled-but-incorrect candidate was Terra's registration validator in task 04. It passed four of five tests. For an empty object, it reported missing username, email, and password fields but omitted \texttt{confirmPassword}, because the implementation compared two absent values as equal. This case directly separates compilation from behavioral compliance, although its frequency, 1/37, does not support a claim that compiled programs often failed the tests.
+
+\subsection{RQ3: Static quality and the full gate}
+Thirty-five of 37 compiled candidates were static-clean (94.6\%). Both lint failures had passed all functional tests. Luna's URL-path normalizer had cyclomatic complexity 13 against the configured maximum of 12. Terra's Promise-timeout utility declared a reassignment-free timer with \texttt{let}, violating \texttt{prefer-const}. No linted candidate used explicit \texttt{any}, suppression comments, or generated a warning.
+
+The static stage reduced the fully correct set from 36 to 34 full-gate programs. Sol and Luna each passed the complete gate for 12/15 candidates (80.0\%); Terra passed for 10/15 (66.7\%). These differences are descriptive observations from one run, not estimates of stable model ordering.
+
+\section{Discussion}
+\subsection{What compilation established}
+Compilation removed eight programs before behavioral evaluation and exposed one recurring TypeScript-specific weakness: candidates relied on runtime bounds or existence checks that did not narrow general indexed access enough for the declared type. The reference solutions needed explicit narrowing or a justified non-null assertion. This result is relevant to TypeScript development because generated JavaScript logic can appear executable while failing a project's strict type contract.
+
+Compilation was nevertheless a strong screen in this sample. Only one of 37 compilable programs failed a visible test. The data therefore support a narrow conclusion: compilation and functional correctness are distinct, but the observed post-compilation functional attrition was small. That distinction matters when the cost of one missed boundary condition is high, yet it should not be inflated into a broad estimate of LLM unreliability.
+
+\subsection{Tests and static analysis answer different questions}
+The registration example shows how a short condition can mishandle two simultaneously missing values while remaining type-correct. Tests supplied evidence about that requirement. Their evidence is finite, however. EvalPlus has shown that expanded suites can expose code accepted by smaller suites \cite{liu2023evalplus}; our label ``fully correct'' means success on four to six visible tests, not specification proof.
+
+The two ESLint findings did not indicate functional defects. One captured a local declaration choice; the other marked complexity just above a project threshold. This modest attrition is still informative because it demonstrates that passing tests does not imply compliance with selected project rules. It does not support claims about maintainability, security, or production readiness. Those constructs require broader measures and, in some cases, human assessment.
+
+\subsection{Implications}
+For developers, the sequential pipeline offers a simple policy: treat generated source as a candidate patch and apply the same compiler, tests, and static checks used for human-written code. The stages are complementary. Strict compilation catches type-contract violations cheaply; tests evaluate specified behavior; static analysis enforces selected project conventions. For researchers, explicit denominators are necessary because compile failures never reach later stages. Reporting a static-clean rate over all generations would conflate rejection with unobserved lint behavior.
+
+\section{Threats to Validity}
+\textit{Construct validity.} Unit tests approximate functional correctness and cover only four to six cases per task. One task description included URL query and fragment handling that its tests did not exercise, which further limits the ``fully correct'' label. ESLint represents a small set of static rules, not general maintainability or security. Strict compilation failures mainly measure explicit handling of conservative indexed-access types and should not be interpreted as algorithmic errors.
+
+\textit{Internal and conclusion validity.} Each model-task pair has one generation. Because temperature control was unsupported, the study cannot separate stable model behavior from sampling variation. Fixed prompts and complete raw-output capture improve auditability but do not remove nondeterminism or provider updates \cite{mastropaolo2023robustness,ouyang2025nondeterminism}. The small paired sample precludes strong ranking claims. The manifest froze tasks, prompt, study configuration, and a dependency lockfile, but did not bind the evaluator source revision or benchmark-agent configuration. The exact campaign-time Node version, operating system, and provider-side model revisions were not captured.
+
+\textit{External validity.} The corpus contains 15 isolated TypeScript utilities, three provider identifiers, one prompt, and visible tests. Results do not generalize to full applications, interactive assistants, repository agents, other languages, or other model revisions. The compact design improves control and reproducibility but is less realistic than class-level or repository-level benchmarks.
+
+\section{Conclusion}
+In 45 generated TypeScript programs, 37 compiled, 36 passed all visible tests, and 34 passed compilation, tests, and selected ESLint rules. The small losses after compilation were enough to show that the gates are not interchangeable. Within this task set, strict compilation was an effective first screen, not a complete quality judgment. Generated TypeScript should remain subject to ordinary software-engineering validation before integration.
+
+\section*{Acknowledgment}
+The author used OpenCode with GPT-5.6-sol and GPT-5.6-luna primarily for technical coding tasks, support for the systematic literature review through Exa AI MCP—including source discovery, metadata verification, and source organization—and language editing, including paraphrasing and correction of language errors. The author independently reviewed and validated all AI-assisted outputs, verified the empirical claims and cited sources, and assumes full responsibility for the accuracy, interpretation, and final content of the manuscript.
+
+
+\IEEEtriggeratref{11}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
